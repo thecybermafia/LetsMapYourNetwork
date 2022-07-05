@@ -210,12 +210,14 @@ def networkscan(scanrange):
     return nm.all_hosts()
 
 def nmapenumeration(node):
+    #Set your network address here
+    #net = ipaddress.ip_network("1.1.0.0/16")
     if "SEED" in str(node.tag):
         node.enum = platform.system() + "#" + platform.platform()
         node.save()
         print "Update for SEED " + node.enum
         return {"Status",True}
-    if ipaddress.ip_address(unicode(node.ip)).is_private:
+    if (ipaddress.ip_address(unicode(node.ip)).is_private) or (ipaddress.ip_address(unicode(node.ip)) in net) :
         print "Enumeration started " + node.ip
         nm = nmap.PortScanner()
         nm.scan(str(node.ip), arguments="--top-ports 5 -O")
