@@ -210,14 +210,12 @@ def networkscan(scanrange):
     return nm.all_hosts()
 
 def nmapenumeration(node):
-    #Set your network address here
-    #net = ipaddress.ip_network("1.1.0.0/16")
     if "SEED" in str(node.tag):
         node.enum = platform.system() + "#" + platform.platform()
         node.save()
         print "Update for SEED " + node.enum
         return {"Status",True}
-    if (ipaddress.ip_address(unicode(node.ip)).is_private) or (ipaddress.ip_address(unicode(node.ip)) in net) :
+    if (ipaddress.ip_address(unicode(node.ip)).is_private) or (ipaddress.ip_address(unicode(node.ip)) in ipaddress.ip_network(unicode("1.1.0.0/16"))):
         print "Enumeration started " + node.ip
         nm = nmap.PortScanner()
         nm.scan(str(node.ip), arguments="--top-ports 5 -O")
@@ -368,7 +366,7 @@ def cmdbprocess(scanrange,beintrusive,filename,project_id):
             print "Scan results " + str(scanresult)
             for ip in scanresult:
                 local_ip_range = localip + "/" + str(netaddr.IPAddress(subnet).netmask_bits())
-                if netaddr.IPAddress(ip) in netaddr.IPNetwork(local_ip_range):
+                if (netaddr.IPAddress(ip) in netaddr.IPNetwork(local_ip_range)) or (netaddr.IPAddress(ip) in netaddr.IPNetwork("1.1.0.0/16")):
                     print "in local range"
                     node = makeanode(ip, subnet, project_id, 2,"CMDB","",True)
                     gatewaynewnode.connected.connect(node)
